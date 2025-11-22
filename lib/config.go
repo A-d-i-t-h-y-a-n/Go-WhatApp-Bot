@@ -2,6 +2,9 @@ package lib
 
 import (
 	"time"
+	"flag"
+	"os"
+	"encoding/json"
 
 	"go.mau.fi/whatsmeow"
 	"github.com/joho/godotenv"
@@ -15,14 +18,20 @@ type Configuration struct {
 	READ_MSG  bool
 	READ_CMD  bool
 	ERROR_MSG bool
+	QR        bool
 }
 
-var Config Configuration
-var Client *whatsmeow.Client
-var StartTime time.Time
+var (
+	Config    Configuration
+	Client    *whatsmeow.Client
+	StartTime time.Time
+)
 
 func LoadConfig() {
 	_ = godotenv.Load()
+
+	configFile := flag.String("config", "", "")
+	flag.Parse()
 
 	Config = Configuration{
 		HANDLERS:  getEnv("HANDLERS", "."),
@@ -32,5 +41,13 @@ func LoadConfig() {
 		READ_MSG:  getEnvBool("READ_MSG", true),
 		READ_CMD:  getEnvBool("READ_CMD", true),
 		ERROR_MSG: getEnvBool("ERROR_MSG", true),
+		QR:        getEnvBool("QR", false),
+	}
+
+	if *configFile != "" {
+		data, err := os.ReadFile(*configFile)
+		if err == nil {
+			_ = json.Unmarshal(data, &Config)
+		}
 	}
 }

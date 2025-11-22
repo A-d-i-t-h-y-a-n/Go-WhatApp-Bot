@@ -63,7 +63,9 @@ func main() {
 		for evt := range qrChan {
 			if evt.Event == "code" {
 				lib.SetQRCode(evt.Code)
-				qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
+				if lib.Config.QR {
+					qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
+				}
 			} else {
 				fmt.Println("Login event:", evt.Event)
 				if evt.Event == "success" {
