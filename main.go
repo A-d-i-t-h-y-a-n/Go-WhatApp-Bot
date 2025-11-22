@@ -32,6 +32,9 @@ var syncMutex sync.Mutex
 
 func main() {
 	lib.LoadConfig()
+
+	go lib.StartServer()
+
 	ctx := context.Background()
 	dbLog := waLog.Noop
 	container, err := sqlstore.New(ctx, "sqlite3", "file:auth.db?_foreign_keys=on", dbLog)
@@ -48,6 +51,8 @@ func main() {
 	fmt.Println("Connecting to WhatsApp...")
 	client := whatsmeow.NewClient(deviceStore, clientLog)
 	client.AddEventHandler(eventHandler)
+	lib.Client = client
+	lib.SetClient(client)
 
 	if client.Store.ID == nil {
 		qrChan, _ := client.GetQRChannel(context.Background())
@@ -57,14 +62,19 @@ func main() {
 		}
 		for evt := range qrChan {
 			if evt.Event == "code" {
+				lib.SetQRCode(evt.Code)
 				qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
 			} else {
 				fmt.Println("Login event:", evt.Event)
+				if evt.Event == "success" {
+					lib.SetConnected(true)
+				}
 			}
 		}
 	} else {
 		err = client.Connect()
 		fmt.Println("Connected")
+		lib.SetConnected(true)
 		if err != nil {
 			panic(err)
 		}
@@ -86,6 +96,7 @@ func main() {
 
 	lib.Client = client
 	lib.StartTime = startTime
+	lib.SetClient(client)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -170,7 +181,6 @@ func handleMessage(evt *events.Message) {
 			if command.OnlyPm && !message.IsPm {
 				continue
 			}
-
 
 			if command.Pattern != nil && lib.Config.READ_CMD {
 				lib.Client.MarkRead(ctx, []types.MessageID{evt.Info.ID}, time.Now(), evt.Info.Chat, evt.Info.Sender)
