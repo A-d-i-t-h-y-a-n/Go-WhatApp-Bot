@@ -32,3 +32,4 @@ Thumbs.db
 *.pem
 *.log
 *.tmp
+*.db

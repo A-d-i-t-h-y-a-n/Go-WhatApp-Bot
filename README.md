@@ -1,6 +1,6 @@
 # Go-WhatsApp-Bot
 
-A dimple WhatsApp Bot based on WhatsMeow
+A simple WhatsApp Bot based on WhatsMeow
 
 Rename `.env.example` to `.env`:
 
