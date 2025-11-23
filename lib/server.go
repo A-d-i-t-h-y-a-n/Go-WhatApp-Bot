@@ -47,8 +47,8 @@ func StartServer() {
 	http.HandleFunc("/pairing", pairingHandler)
 	http.HandleFunc("/status", statusHandler)
 
-	fmt.Println("Web server started at http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	fmt.Println("Web server started at :http://localhost:" + Config.PORT)
+	if err := http.ListenAndServe(":"+Config.PORT, nil); err != nil {
 		fmt.Printf("Web server error: %v\n", err)
 	}
 }

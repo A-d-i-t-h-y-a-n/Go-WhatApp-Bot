@@ -19,6 +19,7 @@ type Configuration struct {
 	READ_CMD  bool
 	ERROR_MSG bool
 	QR        bool
+	PORT      string
 }
 
 var (
@@ -42,7 +43,8 @@ func LoadConfig() {
 		READ_CMD:  getEnvBool("READ_CMD", true),
 		ERROR_MSG: getEnvBool("ERROR_MSG", true),
 		QR:        getEnvBool("QR", false),
-	}
+		PORT:      getEnv("PORT", "8080"),
+	}	
 
 	if *configFile != "" {
 		data, err := os.ReadFile(*configFile)
