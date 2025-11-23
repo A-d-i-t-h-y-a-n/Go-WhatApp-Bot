@@ -26,7 +26,6 @@ var PREFIX string
 var RAGEX string
 
 func init() {
-	LoadConfig()
 	handlers := Config.HANDLERS
 	if handlers == "false" || handlers == "null" {
 		PREFIX = ""

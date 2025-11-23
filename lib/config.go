@@ -42,7 +42,7 @@ func LoadConfig() {
 		READ_MSG:  getEnvBool("READ_MSG", true),
 		READ_CMD:  getEnvBool("READ_CMD", true),
 		ERROR_MSG: getEnvBool("ERROR_MSG", true),
-		QR:        getEnvBool("QR", false),
+		QR:        getEnvBool("QR", true),
 		PORT:      getEnv("PORT", "8080"),
 	}	
 
