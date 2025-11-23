@@ -1,25 +1,25 @@
 package lib
 
 import (
-	"time"
+	"encoding/json"
 	"flag"
 	"os"
-	"encoding/json"
+	"time"
 
 	"go.mau.fi/whatsmeow"
 	"github.com/joho/godotenv"
 )
 
 type Configuration struct {
-	HANDLERS  string
-	SUDO      string
-	MODE      string
-	LOG_MSG   bool
-	READ_MSG  bool
-	READ_CMD  bool
-	ERROR_MSG bool
-	QR        bool
-	PORT      string
+	HANDLERS  string `json:"handlers"`
+	SUDO      string `json:"sudo"`
+	MODE      string `json:"mode"`
+	LOG_MSG   bool   `json:"log_msg"`
+	READ_MSG  bool   `json:"read_msg"`
+	READ_CMD  bool   `json:"read_cmd"`
+	ERROR_MSG bool   `json:"error_msg"`
+	QR        bool   `json:"qr"`
+	PORT      string `json:"port"`
 }
 
 var (
@@ -31,7 +31,10 @@ var (
 func LoadConfig() {
 	_ = godotenv.Load()
 
-	configFile := flag.String("config", "", "")
+	portFlag := flag.String("port", "", "Port number")
+	publicFlag := flag.Bool("public", false, "Run in public mode")
+	configFileFlag := flag.String("config", "", "Config file path")
+
 	flag.Parse()
 
 	Config = Configuration{
@@ -44,12 +47,19 @@ func LoadConfig() {
 		ERROR_MSG: getEnvBool("ERROR_MSG", true),
 		QR:        getEnvBool("QR", true),
 		PORT:      getEnv("PORT", "8080"),
-	}	
+	}
 
-	if *configFile != "" {
-		data, err := os.ReadFile(*configFile)
-		if err == nil {
+	if *configFileFlag != "" {
+		if data, err := os.ReadFile(*configFileFlag); err == nil {
 			_ = json.Unmarshal(data, &Config)
 		}
+	}
+
+	if *portFlag != "" {
+		Config.PORT = *portFlag
+	}
+
+	if *publicFlag {
+		Config.MODE = "public"
 	}
 }
